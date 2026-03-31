@@ -51,6 +51,7 @@ class Ball:
 
         Nota: il bordo Sud non fa rimbalzare — lo gestisce il gioco.
         """
+<<<<<<< HEAD
         self.x += self.vel_x
         self.y += self.vel_y
 
@@ -72,6 +73,9 @@ class Ball:
         # bordo inferiore 
         if self.y + BALL_RADIUS >= screen_h:
             self.alive = False
+=======
+        raise NotImplementedError
+>>>>>>> e20feb00d40d77f6e7fc7459d4dfb080356d57a4
 
     def bounce_off_paddle(self, paddle_rect: pygame.Rect):
         """
@@ -111,4 +115,8 @@ class Ball:
         Ricorda che pygame.draw.circle accetta il centro come
         tupla di interi: (int(self.x), int(self.y)).
         """
+<<<<<<< HEAD
         pygame.draw.circle(surface, BALL_COLOR, (int(self.x), int(self.y)))
+=======
+        raise NotImplementedError
+>>>>>>> e20feb00d40d77f6e7fc7459d4dfb080356d57a4
