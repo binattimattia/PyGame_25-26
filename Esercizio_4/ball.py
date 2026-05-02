@@ -56,12 +56,12 @@ class Ball:
         self.y += self.vel_y
 
         # bordo sinistro
-        if self.x - BALL_RADIUS <= screen_w:
+        if self.x - BALL_RADIUS <= 0:
             self.x = BALL_RADIUS
             self.vel_x = -self.vel_x
 
         # bordo destro
-        if self.x - BALL_RADIUS >= screen_w:
+        if self.x + BALL_RADIUS >= screen_w:
             self.x = screen_w - BALL_RADIUS
             self.vel_x = -self.vel_x
 
@@ -121,4 +121,4 @@ class Ball:
         Ricorda che pygame.draw.circle accetta il centro come
         tupla di interi: (int(self.x), int(self.y)).
         """
-        pygame.draw.circle(surface, BALL_COLOR, (int(self.x), int(self.y)))
+        pygame.draw.circle(surface, BALL_COLOR, (int(self.x), int(self.y)), BALL_RADIUS)

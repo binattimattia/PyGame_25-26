@@ -86,7 +86,19 @@ def draw_hud(surface: pygame.Surface, remaining: float, lives: int):
            x = SCREEN_W - 10 - (i + 1) * (heart_img.get_width() + 4)
            surface.blit(heart_img, (x, 10))
     """
-    raise NotImplementedError
+    timer_text = str(int(remaining))
+    timer_surf = font_medium.render(timer_text, True, TEXT_COLOR)
+    timer_rect = timer_surf.get_rect(centerx=SCREEN_W // 2, top=10)
+    surface.blit(timer_surf, timer_rect)
+
+    margin = 10  # Margine dal bordo destro
+    spacing = 4  # Spazio tra un cuore e l'altro
+    heart_w = heart_img.get_width()
+
+    for i in range(lives):
+        x = SCREEN_W - margin - (i + 1) * (heart_w + spacing)
+        y = 10
+        surface.blit(heart_img, (x, y))
 
 
 def draw_timer_bar(surface: pygame.Surface,
@@ -99,7 +111,8 @@ def draw_timer_bar(surface: pygame.Surface,
         colore (80, 200, 80), stessa altezza e y.
     Usa border_radius=4.
     """
-    raise NotImplementedError
+    bg_rect = pygame.Rect(50, 48, SCREEN_W - 100, 10)
+    pygame.draw.rect(surface, (80, 40, 40), bg_rect, border_radius=4)
 
 
 def draw_end_screen(surface: pygame.Surface, won: bool):
@@ -133,7 +146,12 @@ def reset_game():
 
     Restituisci una tupla: (ball, paddle, start_time, lives)
     """
-    raise NotImplementedError
+    ball = Ball(SCREEN_W // 2, SCREEN_H * 2 // 3)
+    paddle = Paddle(SCREEN_W, SCREEN_H)
+    start_time = time.time()
+    lives = MAX_LIVES
+
+    return ball, paddle, start_time, lives
 
 # ------------------------------------------------------------------ #
 # LOOP PRINCIPALE                                                      #
@@ -145,6 +163,9 @@ def reset_game():
 #
 # Poi dichiara: game_over = False
 
+ball, paddle, start_time, lives = reset_game()
+game_over = False
+won = False
 
 running = True
 
@@ -159,7 +180,10 @@ while running:
         # se game_over è True e viene premuto pygame.K_r,
         # chiama reset_game() e reimposta tutte le variabili di stato,
         # incluso game_over = False.
-
+        if game_over and event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_r:
+                ball, paddle, start_time, lives = reset_game()
+                game_over = False
 
     # ---- 2. AGGIORNA ---------------------------------------------- #
 
@@ -182,7 +206,24 @@ while running:
     #
     # Suggerimento: won = is_expired(start_time, COUNTDOWN) and lives > 0
     # ti serve per sapere se mostrare "Hai vinto" o "Hai perso".
+    if not game_over:
+        keys = pygame.key.get_pressed()
+        paddle.update(keys)
 
+        ball.update(SCREEN_W, SCREEN_H)
+
+        ball.bounce_off_paddle(paddle.rect)
+
+        if not ball.alive:
+            lives -= 1
+            if lives > 0:
+                ball = Ball(SCREEN_W // 2, SCREEN_H * 2 // 3)
+            if lives == 0:
+                game_over = True
+        
+        if is_expired(start_time, COUNTDOWN):
+            game_over = True
+            won = True
 
     # ---- 3. DISEGNA ----------------------------------------------- #
 
@@ -191,6 +232,14 @@ while running:
     # TODO — Chiama draw_hud(), draw_timer_bar(), paddle.draw(),
     # ball.draw() nell'ordine corretto.
     # Se game_over è True, chiama anche draw_end_screen(screen, won).
+    rem = time_remaining(start_time, COUNTDOWN)
+    draw_hud(screen, rem, lives)
+    draw_timer_bar(screen, rem, COUNTDOWN)
+    paddle.draw(screen)
+    ball.draw(screen)
+
+    if game_over:
+        draw_end_screen(screen, won)
 
 
     pygame.display.flip()
